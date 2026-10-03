@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   MONGODB_URI: z.string().min(1),
   JWT_SECRET: z.string().min(32),
-  JWT_EXPIRES_IN: z.string().default('1d'),
+  JWT_EXPIRES_IN: z.coerce.number().int().positive().default(86400), // seconds
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
   ADMIN_EMAIL: z.email(),
   ADMIN_PASSWORD: z.string().min(8),
