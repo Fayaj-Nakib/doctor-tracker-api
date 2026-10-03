@@ -4,6 +4,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env } from './config/env';
+import { authRouter } from './modules/auth/auth.routes';
+import { notFound } from './middleware/notFound';
+import { errorHandler } from './middleware/errorHandler';
 
 export const app = express();
 
@@ -21,3 +24,9 @@ if (env.NODE_ENV !== 'test') {
 app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
+
+app.use('/api/v1/auth', authRouter);
+
+// Must stay last: anything unmatched becomes a 404, every error goes through one handler
+app.use(notFound);
+app.use(errorHandler);

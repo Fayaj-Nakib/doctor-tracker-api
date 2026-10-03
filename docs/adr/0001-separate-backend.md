@@ -13,5 +13,5 @@ No Server Actions or Route Handlers access the database.
 ## Consequences
 + Clear separation of concerns; the API can serve other clients (mobile, integrations).
 + Independent deployment and scaling (Vercel / Render).
-- Cross-origin concerns for auth cookies (addressed in the authentication design).
+- Cross-origin concerns for auth cookies (see ADR 0002).
 - Validation schemas are duplicated in both repos.
