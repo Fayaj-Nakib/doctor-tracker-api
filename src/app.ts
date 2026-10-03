@@ -4,9 +4,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env } from './config/env';
-import { authRouter } from './modules/auth/auth.routes';
-import { notFound } from './middleware/notFound';
 import { errorHandler } from './middleware/errorHandler';
+import { notFound } from './middleware/notFound';
+import { requireAuth, requireRole } from './middleware/requireAuth';
+import { authRouter } from './modules/auth/auth.routes';
+import { doctorRouter } from './modules/doctors/doctor.routes';
+import { metaRouter } from './modules/meta/meta.routes';
+import { patientRouter } from './modules/patients/patient.routes';
+import { statsRouter } from './modules/stats/stats.routes';
 
 export const app = express();
 
@@ -26,6 +31,13 @@ app.get('/api/v1/health', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+
+// Everything below requires a valid session AND the admin role
+const adminOnly = [requireAuth, requireRole('admin')];
+app.use('/api/v1/doctors', adminOnly, doctorRouter);
+app.use('/api/v1/patients', adminOnly, patientRouter);
+app.use('/api/v1/stats', adminOnly, statsRouter);
+app.use('/api/v1/meta', adminOnly, metaRouter);
 
 // Must stay last: anything unmatched becomes a 404, every error goes through one handler
 app.use(notFound);
