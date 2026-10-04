@@ -19,9 +19,11 @@ const patientSchema = new Schema(
   { timestamps: true },
 );
 
-patientSchema.index({ doctor: 1, admittedAt: -1 }); // a doctor's patients, newest first
-patientSchema.index({ condition: 1, admittedAt: -1 }); // filter by condition, newest first
-patientSchema.index({ admittedAt: -1 }); // default sort, date range, time-series stats
+// _id is the last key because every list sorts by { admittedAt, _id } (stable pagination):
+// the index then returns rows already in order, so MongoDB never sorts in memory
+patientSchema.index({ doctor: 1, admittedAt: -1, _id: -1 });
+patientSchema.index({ condition: 1, admittedAt: -1, _id: -1 });
+patientSchema.index({ admittedAt: -1, _id: -1 });
 patientSchema.index({ nameTokens: 1 }); // prefix search on any word of the name
 
 export type Patient = InferSchemaType<typeof patientSchema>;

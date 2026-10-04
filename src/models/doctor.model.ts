@@ -30,10 +30,11 @@ const doctorSchema = new Schema(
   { timestamps: true },
 );
 
-// Each index matches a real query pattern (filter fields first, sort field last)
-doctorSchema.index({ createdAt: -1 }); // default list sort + date filter
-doctorSchema.index({ specialization: 1, createdAt: -1 }); // filter by specialization, newest first
-doctorSchema.index({ hospital: 1, createdAt: -1 }); // filter by hospital, newest first
+// _id is the last key because every list sorts by { createdAt, _id } (stable pagination):
+// the index then returns rows already in order, so MongoDB never sorts in memory
+doctorSchema.index({ createdAt: -1, _id: -1 });
+doctorSchema.index({ specialization: 1, createdAt: -1, _id: -1 });
+doctorSchema.index({ hospital: 1, createdAt: -1, _id: -1 });
 doctorSchema.index({ nameTokens: 1 }); // prefix search on any word of the name
 
 export type Doctor = InferSchemaType<typeof doctorSchema>;
